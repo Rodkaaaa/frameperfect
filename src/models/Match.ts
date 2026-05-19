@@ -1,27 +1,48 @@
-import mongoose, { Schema, models, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const MatchSchema = new Schema({
   tournamentId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Tournament",
   },
 
-  player1: { type: mongoose.Schema.Types.ObjectId, ref: "Player" },
-  player2: { type: mongoose.Schema.Types.ObjectId, ref: "Player" },
-
-  winner: { type: mongoose.Schema.Types.ObjectId, ref: "Player" },
-
   round: Number,
-  pool: String,
 
-  score1: Number,
-  score2: Number,
+  player1: {
+    type: Schema.Types.ObjectId,
+    ref: "Player",
+    default: null,
+  },
+
+  player2: {
+    type: Schema.Types.ObjectId,
+    ref: "Player",
+    default: null,
+  },
+
+  winner: {
+    type: Schema.Types.ObjectId,
+    ref: "Player",
+    default: null,
+  },
 
   status: {
     type: String,
-    enum: ["pending", "playing", "finished"],
     default: "pending",
+  },
+
+  /* 🔥 IMPORTANTE */
+  nextMatchId: {
+    type: Schema.Types.ObjectId,
+    ref: "Match",
+    default: null,
+  },
+
+  nextMatchSlot: {
+    type: Number, // 1 o 2
+    default: null,
   },
 });
 
-export default models.Match || model("Match", MatchSchema);
+export const Match =
+  mongoose.models.Match || mongoose.model("Match", MatchSchema);

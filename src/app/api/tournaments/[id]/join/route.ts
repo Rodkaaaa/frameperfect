@@ -1,55 +1,29 @@
 import { NextResponse } from "next/server";
-import {connectDB} from "@/lib/mongodb";
-import Participant from "@/models/Participant";
-import { Player } from "@/models/Player";
+import { connectDB } from "@/lib/mongodb";
+import { Tournament } from "@/models/Tournament";
 
 export async function POST(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await connectDB();
+  await connectDB();
 
-    const body = await req.json();
+  const { playerId } = await req.json();
 
-    const playerId = body.playerId;
-    const tournamentId = params.id;
+  const tournament = await Tournament.findById(params.id);
 
-    // verificar jugador existe
-    const player = await Player.findById(playerId);
+  if (!tournament)
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    if (!player) {
-      return NextResponse.json(
-        { error: "Player not found" },
-        { status: 404 }
-      );
-    }
+  if (tournament.players.includes(playerId))
+    return NextResponse.json({ error: "Already joined" });
 
-    // evitar doble inscripción
-    const alreadyJoined = await Participant.findOne({
-      playerId,
-      tournamentId,
-    });
+  if (tournament.players.length >= tournament.maxPlayers)
+    return NextResponse.json({ error: "Tournament full" });
 
-    if (alreadyJoined) {
-      return NextResponse.json(
-        { error: "Player already registered" },
-        { status: 400 }
-      );
-    }
+  tournament.players.push(playerId);
 
-    const participant = await Participant.create({
-      playerId,
-      tournamentId,
-    });
+  await tournament.save();
 
-    return NextResponse.json(participant, { status: 201 });
-  } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      { error: "Join failed" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(tournament);
 }

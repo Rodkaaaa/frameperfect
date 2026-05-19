@@ -31,9 +31,13 @@ const PlayerSchema = new Schema(
       type: Number,
       default: 0,
     },
+    role: {
+      type: String,
+      enum: ["player", "organizer", "admin"],
+      default: "player",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const Player =
-  models.Player || model("Player", PlayerSchema);
+export const Player = models.Player || model("Player", PlayerSchema);

@@ -6,8 +6,7 @@ import { Tournament } from "@/models/Tournament";
 export async function GET() {
   await connectDB();
 
-  const tournaments = await Tournament
-    .find()
+  const tournaments = await Tournament.find()
     .populate("organizer")
     .populate("players");
 

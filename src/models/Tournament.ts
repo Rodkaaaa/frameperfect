@@ -38,7 +38,7 @@ const TournamentSchema = new Schema(
 
     startDate: Date,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Tournament =
